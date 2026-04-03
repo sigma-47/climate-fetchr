@@ -58,13 +58,15 @@ def get_weather_data(lat, lon, start_date, end_date, data_type):
     return df
 
 # Example: Minneapolis (your home area)
-LAT, LON = 44.9778, -93.2650
+LAT, LON = 47.69428369380935, -96.50463596449859
+
+get_forecast = False
 
 list()
 beg = dt.today()-td(days=15*365)
-beg = dt.strptime("01-01-2025", "%m-%d-%Y")
+beg = dt.strptime("01-01-1995", "%m-%d-%Y")
 end = dt.today()
-
+end = dt.strptime("12-31-2024", "%m-%d-%Y")
 
 START, END = beg.strftime('%Y-%m-%d'), end.strftime('%Y-%m-%d')
 
@@ -73,21 +75,21 @@ DTYPE = "historical"
 data_df = get_weather_data(LAT, LON, START, END, DTYPE)
 print(data_df)
 
-DTYPE = "forecast"
-data_df = pd.concat([data_df, get_weather_data(LAT, LON, START, END, DTYPE)],
-                       axis=0)
+if get_forecast:
+    DTYPE = "forecast"
+    data_df = pd.concat([data_df, get_weather_data(LAT, LON, START, END, DTYPE)],
+                           axis=0)
+
 
 fig, ax = plt.subplots(figsize=(11,8.5))
 
-
 ax = data_df.loc[beg:end]['temperature_2m_max'].plot(ax=ax, color='red', linestyle='-')
-
-ax = data_df[data_df['type']=='forecast']['temperature_2m_max'].plot(ax=ax, color='red', linestyle='--')
+if get_forecast:
+    ax = data_df[data_df['type']=='forecast']['temperature_2m_max'].plot(ax=ax, color='red', linestyle='--')
 
 ax = data_df.loc[beg:end]['temperature_2m_min'].plot(ax=ax, color='blue', linestyle='-')
+if get_forecast:
+    ax = data_df[data_df['type']=='forecast']['temperature_2m_min'].plot(ax=ax, color='blue', linestyle='--')
 
-ax = data_df[data_df['type']=='forecast']['temperature_2m_min'].plot(ax=ax, color='blue', linestyle='--')
-
-data_df.boxplot(column='precipitation_sum')
 
 plt.show()
